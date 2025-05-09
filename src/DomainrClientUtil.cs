@@ -16,6 +16,8 @@ public class DomainrClientUtil : IDomainrClientUtil
     private readonly IHttpClientCache _httpClientCache;
     private readonly IConfiguration _configuration;
 
+    private const string _clientId = nameof(DomainrClientUtil);
+
     public DomainrClientUtil(IHttpClientCache httpClientCache, IConfiguration configuration)
     {
         _httpClientCache = httpClientCache;
@@ -24,33 +26,32 @@ public class DomainrClientUtil : IDomainrClientUtil
 
     public ValueTask<HttpClient> Get(CancellationToken cancellationToken = default)
     {
-        var host = _configuration.GetValueStrict<string>("Domainr:Host");
-        var apiKey = _configuration.GetValueStrict<string>("Domainr:ApiKey");
-
-        var options = new HttpClientOptions
+        return _httpClientCache.Get(_clientId, () =>
         {
-            BaseAddress = $"https://{host}/v2/",
-            DefaultRequestHeaders = new System.Collections.Generic.Dictionary<string, string>
-            {
-                {"x-rapidapi-key", apiKey},
-                {"x-rapidapi-host", host}
-            }
-        };
+            var host = _configuration.GetValueStrict<string>("Domainr:Host");
+            var apiKey = _configuration.GetValueStrict<string>("Domainr:ApiKey");
 
-        return _httpClientCache.Get(nameof(DomainrClientUtil), options, cancellationToken);
+            return new HttpClientOptions
+            {
+                BaseAddress = $"https://{host}/v2/",
+                DefaultRequestHeaders = new System.Collections.Generic.Dictionary<string, string>
+                {
+                    { "x-rapidapi-key", apiKey },
+                    { "x-rapidapi-host", host }
+                }
+            };
+        }, cancellationToken);
     }
 
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-
-        _httpClientCache.RemoveSync(nameof(DomainrClientUtil));
+        _httpClientCache.RemoveSync(_clientId);
     }
 
     public ValueTask DisposeAsync()
     {
         GC.SuppressFinalize(this);
-
-        return _httpClientCache.Remove(nameof(DomainrClientUtil));
+        return _httpClientCache.Remove(_clientId);
     }
 }
