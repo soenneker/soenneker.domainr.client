@@ -1,17 +1,17 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Soenneker.Domainr.Client.Abstract;
 using Soenneker.Utils.HttpClientCache.Abstract;
-using Soenneker.Utils.HttpClientCache.Dtos;
 using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Soenneker.Dtos.HttpClientOptions;
 using Soenneker.Extensions.Configuration;
 
 namespace Soenneker.Domainr.Client;
 
 /// <inheritdoc cref="IDomainrClientUtil"/>
-public class DomainrClientUtil : IDomainrClientUtil
+public sealed class DomainrClientUtil : IDomainrClientUtil
 {
     private readonly IHttpClientCache _httpClientCache;
     private readonly IConfiguration _configuration;
