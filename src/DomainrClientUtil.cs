@@ -45,13 +45,11 @@ public sealed class DomainrClientUtil : IDomainrClientUtil
 
     public void Dispose()
     {
-        GC.SuppressFinalize(this);
         _httpClientCache.RemoveSync(_clientId);
     }
 
     public ValueTask DisposeAsync()
     {
-        GC.SuppressFinalize(this);
         return _httpClientCache.Remove(_clientId);
     }
 }
