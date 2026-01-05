@@ -28,20 +28,16 @@ public sealed class DomainrClientUtil : IDomainrClientUtil
 
     public ValueTask<HttpClient> Get(CancellationToken cancellationToken = default)
     {
-        return _httpClientCache.Get(_clientId, CreateHttpClientOptions, cancellationToken);
-    }
-
-    private HttpClientOptions? CreateHttpClientOptions()
-    {
-        return new HttpClientOptions
+        // No closure: state passed explicitly + static lambda
+        return _httpClientCache.Get(_clientId, (host: _host, apiKey: _apiKey), static state => new HttpClientOptions
         {
-            BaseAddress = $"https://{_host}/v2/",
+            BaseAddress = $"https://{state.host}/v2/",
             DefaultRequestHeaders = new System.Collections.Generic.Dictionary<string, string>
             {
-                { "x-rapidapi-key", _apiKey },
-                { "x-rapidapi-host", _host }
+                { "x-rapidapi-key", state.apiKey },
+                { "x-rapidapi-host", state.host }
             }
-        };
+        }, cancellationToken);
     }
 
     public void Dispose()
