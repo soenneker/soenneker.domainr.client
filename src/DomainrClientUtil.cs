@@ -14,33 +14,34 @@ namespace Soenneker.Domainr.Client;
 public sealed class DomainrClientUtil : IDomainrClientUtil
 {
     private readonly IHttpClientCache _httpClientCache;
-    private readonly IConfiguration _configuration;
+    private readonly string _host;
+    private readonly string _apiKey;
 
     private const string _clientId = nameof(DomainrClientUtil);
 
     public DomainrClientUtil(IHttpClientCache httpClientCache, IConfiguration configuration)
     {
         _httpClientCache = httpClientCache;
-        _configuration = configuration;
+        _host = configuration.GetValueStrict<string>("Domainr:Host");
+        _apiKey = configuration.GetValueStrict<string>("Domainr:ApiKey");
     }
 
     public ValueTask<HttpClient> Get(CancellationToken cancellationToken = default)
     {
-        return _httpClientCache.Get(_clientId, () =>
-        {
-            var host = _configuration.GetValueStrict<string>("Domainr:Host");
-            var apiKey = _configuration.GetValueStrict<string>("Domainr:ApiKey");
+        return _httpClientCache.Get(_clientId, CreateHttpClientOptions, cancellationToken);
+    }
 
-            return new HttpClientOptions
+    private HttpClientOptions? CreateHttpClientOptions()
+    {
+        return new HttpClientOptions
+        {
+            BaseAddress = $"https://{_host}/v2/",
+            DefaultRequestHeaders = new System.Collections.Generic.Dictionary<string, string>
             {
-                BaseAddress = $"https://{host}/v2/",
-                DefaultRequestHeaders = new System.Collections.Generic.Dictionary<string, string>
-                {
-                    { "x-rapidapi-key", apiKey },
-                    { "x-rapidapi-host", host }
-                }
-            };
-        }, cancellationToken);
+                { "x-rapidapi-key", _apiKey },
+                { "x-rapidapi-host", _host }
+            }
+        };
     }
 
     public void Dispose()
