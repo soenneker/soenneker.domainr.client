@@ -31,7 +31,7 @@ public sealed class DomainrClientUtil : IDomainrClientUtil
         // No closure: state passed explicitly + static lambda
         return _httpClientCache.Get(_clientId, (host: _host, apiKey: _apiKey), static state => new HttpClientOptions
         {
-            BaseAddress = $"https://{state.host}/v2/",
+            BaseAddress = new Uri($"https://{state.host}/v2/"),
             DefaultRequestHeaders = new System.Collections.Generic.Dictionary<string, string>
             {
                 { "x-rapidapi-key", state.apiKey },
