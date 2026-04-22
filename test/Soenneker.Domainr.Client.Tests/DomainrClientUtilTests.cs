@@ -1,20 +1,19 @@
-﻿using Soenneker.Domainr.Client.Abstract;
-using Soenneker.Tests.FixturedUnit;
-using Xunit;
+using Soenneker.Domainr.Client.Abstract;
+using Soenneker.Tests.HostedUnit;
 
 namespace Soenneker.Domainr.Client.Tests;
 
-[Collection("Collection")]
-public class DomainrClientUtilTests : FixturedUnitTest
+[ClassDataSource<Host>(Shared = SharedType.PerTestSession)]
+public class DomainrClientUtilTests : HostedUnitTest
 {
     private readonly IDomainrClientUtil _util;
 
-    public DomainrClientUtilTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
+    public DomainrClientUtilTests(Host host) : base(host)
     {
         _util = Resolve<IDomainrClientUtil>(true);
     }
 
-    [Fact]
+    [Test]
     public void Default()
     {
 
