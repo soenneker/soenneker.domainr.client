@@ -11,9 +11,9 @@ namespace Soenneker.Domainr.Client.Abstract;
 public interface IDomainrClientUtil : IDisposable, IAsyncDisposable
 {
     /// <summary>
-    /// Gets the value.
+    /// Returns the configured http Client used by the domainr client.
     /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task containing the result of the operation.</returns>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A task whose result is the requested http Client.</returns>
     ValueTask<HttpClient> Get(CancellationToken cancellationToken = default);
 }
