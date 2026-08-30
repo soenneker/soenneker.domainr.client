@@ -52,6 +52,8 @@ public sealed class DomainSearch(IDomainrClientUtil clientProvider)
 
 `Get` returns the cached client. Do not dispose the returned `HttpClient`; dispose response messages and response streams you create. The provider owns the cache entry.
 
+Automatic redirects are disabled so the custom RapidAPI headers cannot be forwarded to another host. Treat a redirect response as an explicit trust decision instead of following its `Location` with the authenticated client.
+
 Singleton registration is the normal choice for direct transport use. `AddDomainrClientUtilAsScoped()` scopes the provider but still uses the shared singleton HTTP-client cache; disposing that provider removes its named cache entry.
 
 This package configures transport only. It does not encode query values, deserialize Domainr responses, check status codes, retry rate limits, or translate errors. Use `Soenneker.Domainr.Util` when you want the higher-level search and status operations.
