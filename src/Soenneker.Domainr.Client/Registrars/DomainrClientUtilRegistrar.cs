@@ -6,7 +6,7 @@ using Soenneker.Utils.HttpClientCache.Registrar;
 namespace Soenneker.Domainr.Client.Registrars;
 
 /// <summary>
-/// A .NET thread-safe singleton HttpClient for Domainr
+/// Registers the cached Domainr HTTP client provider.
 /// </summary>
 public static class DomainrClientUtilRegistrar
 {

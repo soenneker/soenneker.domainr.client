@@ -10,7 +10,6 @@ using Soenneker.Extensions.Configuration;
 
 namespace Soenneker.Domainr.Client;
 
-/// <inheritdoc cref="IDomainrClientUtil"/>
 public sealed class DomainrClientUtil : IDomainrClientUtil
 {
     private readonly IHttpClientCache _httpClientCache;

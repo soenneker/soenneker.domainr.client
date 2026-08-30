@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 namespace Soenneker.Domainr.Client.Abstract;
 
 /// <summary>
-/// A .NET thread-safe singleton HttpClient for Domainr
+/// Provides a cached RapidAPI-configured HTTP client for Domainr.
 /// </summary>
 public interface IDomainrClientUtil : IDisposable, IAsyncDisposable
 {
     /// <summary>
-    /// Returns the configured http Client used by the domainr client.
+    /// Returns the configured HTTP client used for Domainr requests.
     /// </summary>
     /// <param name="cancellationToken">Token used to cancel the operation.</param>
     /// <returns>A task whose result is the requested http Client.</returns>

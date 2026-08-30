@@ -5,40 +5,53 @@
 
 # Soenneker.Domainr.Client
 
-A .NET thread-safe singleton HttpClient for Domainr.
+Provides a cached `HttpClient` configured for Domainr through RapidAPI.
 
-## Install
+## Installation
 
 ```bash
 dotnet add package Soenneker.Domainr.Client
 ```
 
-## Quick start
+## Configuration
 
-```csharp
-using Soenneker.Domainr.Client.Registrars;
-using Microsoft.Extensions.DependencyInjection;
-
-var services = new ServiceCollection();
-var result = services.AddDomainrClientUtilAsSingleton();
+```json
+{
+  "Domainr": {
+    "Host": "domainr.p.rapidapi.com",
+    "ApiKey": "your-rapidapi-key"
+  }
+}
 ```
 
-Adds `IDomainrClientUtil` as a singleton service.
+The client builds its base address as `https://{Host}/v2/` and sends the configured values as `x-rapidapi-host` and `x-rapidapi-key`. Keep the API key in a secret provider. Treat `Host` as trusted configuration because changing it changes the destination that receives the key.
 
-## What you get
+## Registration and use
 
-- `IDomainrClientUtil` — A .NET thread-safe singleton HttpClient for Domainr.
-- `DomainrClientUtilRegistrar` — A .NET thread-safe singleton HttpClient for Domainr.
+```csharp
+using Soenneker.Domainr.Client.Abstract;
+using Soenneker.Domainr.Client.Registrars;
 
-## API at a glance
+services.AddDomainrClientUtilAsSingleton();
 
-| API | What it does | Result / important behavior |
-| --- | --- | --- |
-| `DomainrClientUtilRegistrar.AddDomainrClientUtilAsSingleton(services)` | Adds `IDomainrClientUtil` as a singleton service. | The same service collection, so additional registrations can be chained. |
-| `DomainrClientUtilRegistrar.AddDomainrClientUtilAsScoped(services)` | Adds `IDomainrClientUtil` as a scoped service. | The same service collection, so additional registrations can be chained. |
+public sealed class DomainSearch(IDomainrClientUtil clientProvider)
+{
+    public async Task<string> Search(string query, CancellationToken cancellationToken)
+    {
+        HttpClient client = await clientProvider.Get(cancellationToken);
+        string escaped = Uri.EscapeDataString(query);
 
-## Practical notes
+        using HttpResponseMessage response =
+            await client.GetAsync($"search?query={escaped}", cancellationToken);
 
-- Reuse the registered client instead of constructing one per operation.
-- Calls that return a cached or singleton value reuse the same instance until the owning service is disposed.
-- Dispose instances you own when their scope ends so held resources can be released.
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync(cancellationToken);
+    }
+}
+```
+
+`Get` returns the cached client. Do not dispose the returned `HttpClient`; dispose response messages and response streams you create. The provider owns the cache entry.
+
+Singleton registration is the normal choice for direct transport use. `AddDomainrClientUtilAsScoped()` scopes the provider but still uses the shared singleton HTTP-client cache; disposing that provider removes its named cache entry.
+
+This package configures transport only. It does not encode query values, deserialize Domainr responses, check status codes, retry rate limits, or translate errors. Use `Soenneker.Domainr.Util` when you want the higher-level search and status operations.
