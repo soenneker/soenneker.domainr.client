@@ -22,8 +22,8 @@ public sealed class DomainrClientUtil : IDomainrClientUtil
     public DomainrClientUtil(IHttpClientCache httpClientCache, IConfiguration configuration)
     {
         _httpClientCache = httpClientCache;
-        _host = configuration.GetValueStrict<string>("Domainr:Host");
-        _apiKey = configuration.GetValueStrict<string>("Domainr:ApiKey");
+        _host = configuration.GetStringStrict("Domainr:Host");
+        _apiKey = configuration.GetStringStrict("Domainr:ApiKey");
     }
 
     public ValueTask<HttpClient> Get(CancellationToken cancellationToken = default)
